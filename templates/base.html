@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mental Health App for mood tracking, stress management, and mental health resources.">
+    <title>Menti Bot App</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Typed.js for animated typing effect -->
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" >
+
+
+    <style>
+        /* Base Font Style */
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Gradient Background for Header */
+        .header-bg {
+            background: linear-gradient(90deg, rgba(30, 64, 175, 1) 0%, rgba(14, 116, 144, 1) 100%);
+        }
+        .typed-cursor {
+            opacity: 1;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .hover-effect:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease-in-out;
+        }
+        .btn-primary {
+            background-color: #2563eb; /* Blue */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* Darker Blue */
+            transform: translateY(-2px);
+        }
+        /* Footer Links Styling */
+        .social-icons a {
+            transition: color 0.3s ease-in-out;
+        }
+        .social-icons a:hover {
+            color: #38bdf8; /* Light Blue */
+        }
+        /* Modal Styles */
+        #logout-modal {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        /* Back to Top Button */
+        #back-to-top-btn {
+            transition: opacity 0.3s ease;
+        }
+
+        /* Responsive Adjustments */
+        @media (min-width: 768px) {
+            .nav-links a {
+                padding: 10px 20px;
+                border-radius: 5px;
+                transition: background-color 0.3s ease-in-out;
+            }
+            .nav-links a:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Header Section with Sticky Navigation -->
+    <header class="header-bg p-6 text-white text-center shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Logo and Typed Animation -->
+            <div class="flex items-center space-x-3">
+                <!-- Logo with Hover Effect -->
+                <a href="/" class="hover-effect">
+                    <img src="https://yt3.googleusercontent.com/CXVIJPX1X4ut-IzEjDy0mAsKPsf3QZ1UaWu6RjHVtu7lQYrdh7Hx0IyJWvRykaHtqClcLi8g=s900-c-k-c0x00ffffff-no-rj" 
+                         alt="App Logo" class="w-12 h-12 rounded-full">
+                </a>
+                <!-- Typed Text Animation -->
+                <h1 class="text-3xl font-bold tracking-wide">
+                    <span id="typed-header"></span>
+                </h1>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links hidden md:flex space-x-6">
+                <a href="/index" class="text-white hover:text-gray-300 transition">Home</a>
+                <a href="/chatbot" class="text-white hover:text-gray-300 transition">Chatbot</a>
+                <a href="/mood-tracker" class="text-white hover:text-gray-300 transition">Mood Tracker</a>
+                <a href="/stress-management" class="text-white hover:text-gray-300 transition">Stress Management</a>
+
+                <!-- Logout Button -->
+                <button id="logout" 
+                        class="btn-primary text-white py-2 px-4 rounded shadow-lg hover:bg-red-500 transition duration-300"
+                        onclick="confirmLogout()">
+                    Logout
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto mt-10 px-4 lg:px-8" id="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer Section with Social Links -->
+<footer class="bg-gray-900 text-white py-10 mt-10">
+    <div class="container text-center">
+        <!-- Social Icons -->
+        <div class="social-icons mb-4 flex justify-center space-x-8">
+            <a href="#" class="hover:text-blue-400">
+                <i class="fab fa-facebook fa-2x"></i>
+            </a>
+            <a href="#" class="hover:text-blue-400">
+                <i class="fab fa-twitter fa-2x"></i>
+            </a>
+            <a href="#" class="hover:text-blue-400">
+                <i class="fab fa-instagram fa-2x"></i>
+            </a>
+            <a href="#" class="hover:text-blue-400">
+                <i class="fab fa-linkedin fa-2x"></i>
+            </a>
+        </div>
+        <p class="text-gray-400">Utkarsh Gupta &copy; 2024 Menti Bot App. All rights reserved.</p>
+    </div>
+</footer>
+
+
+    <!-- Back to Top Button -->
+    <button onclick="scrollToTop()" id="back-to-top-btn" 
+            class="fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 hidden">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-lg font-semibold mb-4">Confirm Logout</h2>
+            <p class="mb-6">Are you sure you want to log out?</p>
+            <div class="flex justify-end space-x-4">
+                <button class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600" onclick="closeLogoutModal()">Cancel</button>
+                <form action="{{ url_for('logout') }}" method="POST">
+                    <button type="submit" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Typed.js Initialization for Dynamic Text -->
+    <script>
+        var typed = new Typed('#typed-header', {
+            strings: ['Mental Health App', 'Your Personal Wellbeing Companion', 'Explore Mindfulness & Care'],
+            typeSpeed: 50,
+            backSpeed: 40,
+            loop: true
+        });
+    </script>
+
+    <!-- Back to Top Button Logic -->
+    <script>
+        window.onscroll = function() {
+            const btn = document.getElementById('back-to-top-btn');
+            if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function confirmLogout() {
+            document.getElementById('logout-modal').classList.remove('hidden');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logout-modal').classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>

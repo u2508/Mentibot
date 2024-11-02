@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto p-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg text-white mt-8">
+    <h2 class="text-4xl font-extrabold mb-6 text-center">Mood Tracker</h2>
+
+    <!-- Mood Logging Form -->
+    <form id="mood-form" class="bg-white rounded-lg p-6 shadow-md text-gray-800 mb-8">
+        <h3 class="text-2xl font-semibold text-center mb-4">Log Your Mood</h3>
+        <div class="mb-6">
+            <label for="mood-label" class="block font-semibold mb-2">Mood</label>
+            <select id="mood" name="mood" class="w-full border p-3 rounded-md focus:outline-none focus:ring focus:ring-blue-500">
+                <option value="Happy">😊 Happy</option>
+                <option value="Neutral">😐 Neutral</option>
+                <option value="Sad">😢 Sad</option>
+                <option value="Stressed">😟 Stressed</option>
+            </select>
+        </div>
+        <div class="mb-6">
+            <label for="note-label" class="block font-semibold mb-2">Note</label>
+            <textarea id="note" name="note" class="w-full border p-3 rounded-md focus:outline-none focus:ring focus:ring-blue-500" placeholder="Add any details..."></textarea>
+        </div>
+        <button id="submit" type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-6 rounded-md hover:bg-indigo-600 transition duration-300 font-bold">
+            Log Mood
+        </button>
+    </form>
+
+    <!-- Mood Trends Section -->
+    <div class="mt-12 text-center">
+        <h3 class="text-2xl font-semibold mb-6">Mood Trends</h3>
+        <div class="flex justify-center mb-6">
+            <button id="toggle-chart" class="bg-gray-600 text-white py-2 px-6 rounded-md hover:bg-gray-700 transition duration-300 mx-2">
+                Toggle to Bar Chart
+            </button>
+            <button id="average-mood-btn" class="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition duration-300 mx-2">
+                Show Average Mood
+            </button>
+            <button id="export-data" class="bg-purple-500 text-white py-2 px-6 rounded-md hover:bg-purple-600 transition duration-300 mx-2">
+                Export Mood Data
+            </button>
+        </div>
+
+        <!-- Charts -->
+        <canvas id="mood-chart" class="my-8"></canvas>
+        <canvas id="mood-bar-chart" class="my-8" style="display: none;"></canvas> <!-- Hidden initially -->
+    </div>
+</div>
+
+<!-- Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Fetch mood data
+    fetch('/mood-tracker/data')
+        .then(response => response.json())
+        .then(data => {
+            // Mapping moods to y-axis values
+            const moodMap = { "Happy": 4, "Neutral": 3, "Stressed": 2, "Sad": 1 };
+            const reverseMoodMap = { 4: "Happy", 3: "Neutral", 2: "Stressed", 1: "Sad" };
+
+            // Function to calculate average mood score in a cluster
+            function calculateAverageMood(entries) {
+                let totalScore = 0;
+                entries.forEach(entry => {
+                    totalScore += moodMap[entry.mood] || 0;
+                });
+                return (totalScore / entries.length).toFixed(2);
+            }
+
+            function scoreToMood(score) {
+                if (score >= 3.5) return 'Happy';
+                if (score >= 2.5) return 'Neutral';
+                if (score >= 1.5) return 'Stressed';
+                return 'Sad';
+            }
+
+            // Group data into clusters of 5
+            function groupDataIntoClusters(data) {
+                const clusters = [];
+                for (let i = 0; i < data.length; i += 5) {
+                    const cluster = data.slice(i, i + 5);
+                    clusters.push({
+                        date: `${cluster[0].date} - ${cluster[cluster.length - 1].date}`,
+                        averageMood: scoreToMood(calculateAverageMood(cluster)),
+                        note: cluster.map(entry => entry.note).join(", ") // Combine notes
+                    });
+                }
+                return clusters;
+            }
+
+            let displayData = data;
+            if (data.length > 20) {
+                displayData = groupDataIntoClusters(data);
+            }
+
+            // Prepare data for line and bar charts
+            const dates = displayData.map(entry => entry.date);
+            const moodScores = displayData.map(entry => moodMap[entry.averageMood || entry.mood]);
+            const moodNotes = displayData.map(entry => entry.note); // Store notes for hover
+
+            // Create Line Chart for Moods Over Time
+            const ctxLine = document.getElementById('mood-chart').getContext('2d');
+            const moodChart = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Mood Over Time',
+                        data: moodScores,
+                        fill: false,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return reverseMoodMap[value];
+                                },
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    const mood = reverseMoodMap[tooltipItem.raw];
+                                    const note = moodNotes[tooltipItem.dataIndex];
+                                    return `${mood}: ${note}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create Bar Chart for Mood Distribution
+            const moodDistribution = { "Happy": 0, "Neutral": 0, "Sad": 0, "Stressed": 0 };
+            data.forEach(entry => {
+                moodDistribution[entry.mood]++;
+            });
+
+            const ctxBar = document.getElementById('mood-bar-chart').getContext('2d');
+            const moodBarChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(moodDistribution),
+                    datasets: [{
+                        label: 'Mood Count',
+                        data: Object.values(moodDistribution),
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Toggle charts
+            let isLineChart = true;
+            document.getElementById('toggle-chart').addEventListener('click', () => {
+                if (isLineChart) {
+                    document.getElementById('mood-chart').style.display = 'none';
+                    document.getElementById('mood-bar-chart').style.display = 'block';
+                    document.getElementById('toggle-chart').textContent = 'Toggle to Line Chart';
+                } else {
+                    document.getElementById('mood-chart').style.display = 'block';
+                    document.getElementById('mood-bar-chart').style.display = 'none';
+                    document.getElementById('toggle-chart').textContent = 'Toggle to Bar Chart';
+                }
+                isLineChart = !isLineChart;
+            });
+
+            // Show average mood
+            document.getElementById('average-mood-btn').addEventListener('click', () => {
+                const overallAverageMood = scoreToMood(calculateAverageMood(data));
+                alert(`The overall average mood is: ${overallAverageMood}`);
+            });
+
+            // Export data functionality
+            document.getElementById('export-data').addEventListener('click', () => {
+                window.location.href = '/export-data';
+            });
+
+            // Form submission logic with auto-update
+            document.getElementById('mood-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const mood = document.getElementById('mood').value;
+                const note = document.getElementById('note').value;
+
+                fetch('/mood-tracker-data', {
+                    method: 'POST',
+                    body: new URLSearchParams({'mood': mood, 'note': note}),
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                }).then(response => {
+                    if (response.ok) {
+                        alert('Mood logged successfully!');
+                        location.reload(); // Reload the page to update charts
+                    }
+                });
+            });
+        });
+});
+</script>
+{% endblock %}

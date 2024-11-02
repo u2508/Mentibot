@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-6 bg-white rounded-lg shadow">
+    <h2 class="text-xl font-semibold mb-4">Mental Health Chatbot</h2>
+    <div id="chat-window" class="h-64 bg-gray-100 p-4 overflow-auto border">
+        <p><strong>Bot:</strong> Hello! How can I assist you today?</p>
+    </div>
+    <form id="chat-form" class="mt-4">
+        <input type="text" id="message" placeholder="Type your message..." class="w-full border p-2">
+        <button type="submit" class="mt-2 bg-blue-500 text-white py-2 px-4 rounded">Send</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('chat-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const message = document.getElementById('message').value;
+    fetch('/chatbot/respond', {
+        method: 'POST',
+        body: new URLSearchParams({'message': message}),
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        const chatWindow = document.getElementById('chat-window');
+        chatWindow.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+        chatWindow.innerHTML += `<p><strong>Bot:</strong> ${data.message}</p>`;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        document.getElementById('message').value = '';
+    });
+});
+</script>
+{% endblock %}

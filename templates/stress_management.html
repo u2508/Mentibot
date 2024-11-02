@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex">
+    <!-- Sidebar -->
+    <div class="w-1/4 bg-gray-200 p-4 rounded-lg shadow mr-6">
+        <h3 class="text-lg font-semibold mb-4">Exercises</h3>
+        <ul>
+            <li class="mb-2">
+                <button class="bg-blue-500 text-white py-2 px-4 rounded w-full" onclick="loadMedia('meditation')">Guided Meditation</button>
+            </li>
+            <li class="mb-2">
+                <button class="bg-blue-500 text-white py-2 px-4 rounded w-full" onclick="loadMedia('breathing')">Breathing Exercises</button>
+            </li>
+            <li class="mb-2">
+                <button class="bg-blue-500 text-white py-2 px-4 rounded w-full" onclick="loadMedia('yoga')">Yoga Session</button>
+            </li>
+            <li class="mb-2 relative">
+                <!-- Relaxation Music Button with Submenu -->
+                <button class="bg-blue-500 text-white py-2 px-4 rounded w-full" onclick="toggleRelaxationMenu()">Relaxation Music</button>
+                <ul id="relaxation-menu" class="bg-white border rounded mt-2 hidden absolute left-0 w-full">
+                    <li class="border-b">
+                        <button class="text-blue-500 py-2 px-4 w-full text-left" onclick="loadRelaxationSong('song1-1.mp3','song1-2.mp3', 'Relaxing rain')">Relaxation Song 1</button>
+                    </li>
+                    <li class="border-b">
+                        <button class="text-blue-500 py-2 px-4 w-full text-left" onclick="loadRelaxationSong('song2-1.mp3','song2-2.mp3', 'Relaxing firewoods')">Relaxation Song 2</button>
+                    </li>
+                    <li class="border-b">
+                        <button class="text-blue-500 py-2 px-4 w-full text-left" onclick="loadRelaxationSong('song3-1.mp3','song3-2.mp3', 'Relaxing ocean')">Relaxation Song 3</button>
+                    </li>
+                    <li class="border-b">
+                        <button class="text-blue-500 py-2 px-4 w-full text-left" onclick="loadRelaxationSong('song4-1.mp3','song4-2.mp3', 'Bird chirps')">Relaxation Song 4</button>
+                    </li>
+                    <li>
+                        <button class="text-blue-500 py-2 px-4 w-full text-left" onclick="loadRelaxationSong('song5-1.mp3','song5-2.mp3', 'Relaxation Song 5')">Relaxation Song 5</button>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main content area -->
+    <div class="w-3/4 p-6 bg-white rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">Stress Management Tools</h2>
+
+        <!-- Media Container -->
+        <div id="media-container" class="mb-4">
+            <h3 class="text-lg font-semibold" id="media-title">Guided Meditation</h3>
+            
+            <!-- Audio Player (Hidden for Video) -->
+            <audio controls id="audio-player" class="w-full hidden">
+                <source id="audio-source" src="/media/meditation.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <audio controls id="audio-player2" class="w-full hidden">
+                <source id="audio-source2" src="/media/meditation.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+
+            <!-- Video Player -->
+            <video controls id="video-player" class="w-full">
+                <source id="video-source" src="/media/breathing.mp4" type="video/mp4">
+                Your browser does not support the video element.
+            </video>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    function loadMedia(type) {
+        const audioPlayer = document.getElementById('audio-player');
+        const videoPlayer = document.getElementById('video-player');
+        const mediaTitle = document.getElementById('media-title');
+
+        if (type === 'meditation') {
+            audioPlayer.classList.remove('hidden');
+            videoPlayer.classList.add('hidden');
+            mediaTitle.textContent = 'Guided Meditation';
+            document.getElementById('audio-source').src = '/media/meditation.mp3';
+            audioPlayer.load();
+        } else if (type === 'breathing') {
+            audioPlayer.classList.add('hidden');
+            videoPlayer.classList.remove('hidden');
+            mediaTitle.textContent = 'Breathing Exercises';
+            document.getElementById('video-source').src = '/media/breathing.mp4';
+            videoPlayer.load();
+        } else if (type === 'yoga') {
+            audioPlayer.classList.add('hidden');
+            videoPlayer.classList.remove('hidden');
+            mediaTitle.textContent = 'Yoga Session';
+            document.getElementById('video-source').src = '/media/yoga.mp4';
+            videoPlayer.load();
+        }
+    }
+
+    // Toggle Relaxation Submenu
+    function toggleRelaxationMenu() {
+        const menu = document.getElementById('relaxation-menu');
+        menu.classList.toggle('hidden');
+    }
+
+    // Load selected relaxation song
+    function loadRelaxationSong(songFile,songFile2, songTitle) {
+        const audioPlayer = document.getElementById('audio-player');
+        const audioPlayer1 = document.getElementById('audio-player2');
+        const videoPlayer = document.getElementById('video-player');
+        const mediaTitle = document.getElementById('media-title');
+        
+        // Hide the submenu after selection
+        document.getElementById('relaxation-menu').classList.add('hidden');
+        audioPlayer.classList.remove('hidden');
+        audioPlayer1.classList.remove('hidden');
+        videoPlayer.classList.add('hidden');
+        mediaTitle.textContent = songTitle;
+        document.getElementById('audio-source').src = `/media/${songFile}`;
+        
+        document.getElementById('audio-source2').src = `/media/${songFile2}`;
+        audioPlayer.load();
+
+    }
+</script>
+
+{% endblock %}

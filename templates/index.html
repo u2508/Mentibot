@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Main Content Section with a Soothing Background -->
+<main class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 py-24 relative overflow-hidden">
+
+    <!-- Floating Shapes to Create a Calming Visual Effect -->
+    <div class="absolute top-0 left-0 w-64 h-64 bg-blue-300 opacity-40 rounded-full filter blur-2xl transform -translate-x-32 -translate-y-32 animate-pulse"></div>
+    <div class="absolute bottom-0 right-0 w-48 h-48 bg-teal-300 opacity-40 rounded-full filter blur-2xl transform translate-x-20 translate-y-20 animate-ping"></div>
+
+    <!-- Welcome Section with Animated Greeting -->
+    <div class="container mx-auto text-center text-white relative z-10">
+        <h1 class="text-5xl font-bold mb-6 leading-tight animate-fadeIn">Welcome to Your Mental Health Hub</h1>
+        <p class="text-lg mb-12 max-w-xl mx-auto leading-relaxed animate-fadeIn">We’re here to support your mental health journey. Track your mood, reduce stress, and chat with our friendly AI assistant to get personalized tips.</p>
+        
+        <!-- Animated Button with Ripple Effect -->
+        <a href="#" class="bg-gradient-to-r from-green-300 to-blue-400 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:bg-blue-500 transition-transform transform hover:scale-110 duration-300 ease-out animate-bounce">Get Started</a>
+    </div>
+</main>
+
+<!-- Dashboard Section with Interactive Widgets -->
+<section class="container mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 px-6">
+    
+    <!-- Mood Tracker Widget with Progress Bar -->
+    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 hover:scale-105">
+        <div class="flex items-center mb-6">
+            <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl">
+                <i class="fas fa-smile"></i>
+            </div>
+            <h3 class="text-2xl font-bold ml-16 text-gray-800">Mood Tracker</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Log your mood every day and see trends over time to better understand your mental health. Here's your progress:</p>
+        <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+            <div id='progress' class="bg-blue-600 h-4 rounded-full" style="width: 70%;"></div>
+        </div>
+        <a href="/mood-tracker" class="text-blue-600 font-bold hover:text-blue-800 hover:underline">Track Your Mood</a>
+    </div>
+
+    <!-- Chatbot Widget with Friendly UI -->
+    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 hover:scale-105">
+        <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-teal-600 text-white rounded-full flex justify-center items-center text-2xl">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3 class="text-2xl font-bold ml-4 text-gray-800">Mental Health Chatbot</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Chat with our AI assistant for personalized mental health tips and support. Available 24/7 for you!</p>
+        <a href="/chatbot" class="text-blue-600 font-bold hover:text-blue-800 hover:underline">Start Chatting</a>
+    </div>
+
+    <!-- Stress Management Widget with Interactive Audio/Video -->
+    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 hover:scale-105">
+        <div class="flex items-center mb-6">
+            <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-purple-600 w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl">
+                <i class="fas fa-spa"></i>
+            </div>
+            <h3 class="text-2xl font-bold ml-9 text-gray-800">Stress Management</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Practice mindfulness, guided meditation, and breathing exercises to manage stress. Select your preferred activity below:</p>
+        <div class="flex space-x-2">
+            <a href="/stress-management" class="text-blue-600 font-bold hover:text-blue-800 hover:underline">Explore</a>
+        </div>
+    </div>
+</section>
+
+<!-- Dynamic Quotes Section to Uplift Users -->
+<section class="container mx-auto mt-16 px-6 text-center">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-700">Uplifting Quotes</h2>
+    <p class="text-gray-500 mb-4">Let these words guide you through your mental health journey:</p>
+    <div class="bg-white py-8 px-6 rounded-lg shadow-lg">
+        <p class="text-xl font-semibold text-blue-600" id="quote"></p>
+    </div>
+</section>
+
+<script>
+    // Dynamic Quotes with Animation
+    const quotes = [
+        "Your mental health is a priority, not an option.",
+        "Take time to do what makes your soul happy.",
+        "You don’t have to be perfect to be amazing.",
+        "Healing is not linear, but it’s always worth it."
+    ];
+    let currentQuote = 0;
+    const quoteElement = document.getElementById('quote');
+    
+    function updateQuote() {
+        quoteElement.textContent = quotes[currentQuote];
+        quoteElement.classList.add('fade-in');
+        setTimeout(() => quoteElement.classList.remove('fade-in'), 1000);
+        currentQuote = (currentQuote + 1) % quotes.length;
+    }
+    setInterval(updateQuote, 5000);  // Update quote every 5 seconds
+</script>
+
+{% endblock %}
